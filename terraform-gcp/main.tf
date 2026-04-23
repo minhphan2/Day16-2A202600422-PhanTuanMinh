@@ -92,8 +92,8 @@ resource "google_compute_instance" "gpu_node" {
 
   boot_disk {
     initialize_params {
-      # Deep Learning VM image with CUDA pre-installed
-      image = "projects/deeplearning-platform-release/global/images/family/common-cu121-debian-11"
+      # Ubuntu 22.04 LTS (CPU mode - no Deep Learning VM needed)
+      image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
       size  = 100
       type  = "pd-ssd"
     }
@@ -105,13 +105,13 @@ resource "google_compute_instance" "gpu_node" {
     # No access_config block = no public IP (private only)
   }
 
-  guest_accelerator {
-    type  = var.gpu_type
-    count = var.gpu_count
-  }
+  # guest_accelerator {   # Commented out for CPU mode
+  #   type  = var.gpu_type
+  #   count = var.gpu_count
+  # }
 
   scheduling {
-    on_host_maintenance = "TERMINATE"
+    on_host_maintenance = "MIGRATE"   # MIGRATE for CPU (use TERMINATE for GPU)
     automatic_restart   = true
   }
 
